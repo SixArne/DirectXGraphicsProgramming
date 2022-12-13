@@ -4,6 +4,7 @@ struct SDL_Window;
 struct SDL_Surface;
 
 #include "Mesh.h"
+#include "Camera.h"
 
 namespace dae
 {
@@ -18,12 +19,12 @@ namespace dae
 		Renderer& operator=(const Renderer&) = delete;
 		Renderer& operator=(Renderer&&) noexcept = delete;
 
-		void Update(const Timer* pTimer);
+		void Update(Timer* pTimer);
 		void Render() const;
 
 	private:
 		SDL_Window* m_pWindow{};
-		
+
 		// DirectX members
 		ID3D11Device* m_pDevice{};
 		ID3D11DeviceContext* m_pDeviceContext{};
@@ -40,6 +41,8 @@ namespace dae
 		ID3D11RenderTargetView* m_pRenderTargetView{};
 
 		Mesh* m_pMesh;
+		Camera* m_pCamera{};
+		Texture* m_pDiffuseTexture{};
 
 		int m_Width{};
 		int m_Height{};

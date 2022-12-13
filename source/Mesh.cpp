@@ -8,17 +8,26 @@ Mesh::Mesh(ID3D11Device* pDevice, std::vector<Vertex>& vertices, std::vector<uin
 	m_pEffectTechnique = m_pEffect->GetTechnique();
 
 	// Vertex layout
-	const uint32_t numElements{ 2 };
+	const uint32_t numElements{ 3 };
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
+
+	// Position
 	vertexDesc[0].SemanticName = "POSITION";
 	vertexDesc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	vertexDesc[0].AlignedByteOffset = 0;
+	vertexDesc[0].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	vertexDesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
+	// Color
 	vertexDesc[1].SemanticName = "COLOR";
 	vertexDesc[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	vertexDesc[1].AlignedByteOffset = 12;
+	vertexDesc[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	vertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	// UV coordinates
+	vertexDesc[2].SemanticName = "TEXCOORD";
+	vertexDesc[2].Format = DXGI_FORMAT_R32G32_FLOAT;
+	vertexDesc[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	vertexDesc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 	// Create vertex buffer
 	D3D11_BUFFER_DESC bd{};
@@ -74,7 +83,7 @@ Mesh::Mesh(ID3D11Device* pDevice, std::vector<Vertex>& vertices, std::vector<uin
 	}
 }
 
-void Mesh::Render(ID3D11DeviceContext* pDeviceContext) const
+void Mesh::Render(ID3D11DeviceContext* pDeviceContext, dae::Matrix& wvp) const
 {
 	// Set primitive topology
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -88,6 +97,7 @@ void Mesh::Render(ID3D11DeviceContext* pDeviceContext) const
 	ID3D11Buffer* pVertexBuffer = m_pVertexBuffer;
 
 	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
+	m_pEffect->GetMatrixVariable()->SetMatrix((float*)(&wvp));
 
 	// Set indexBuffer
 	pDeviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
@@ -100,6 +110,11 @@ void Mesh::Render(ID3D11DeviceContext* pDeviceContext) const
 		m_pEffect->GetTechnique()->GetPassByIndex(p)->Apply(0, pDeviceContext);
 		pDeviceContext->DrawIndexed(m_NumIndices, 0, 0);
 	}
+}
+
+void Mesh::SetTexture(dae::Texture* texture)
+{
+	m_pEffect->SetDiffuseMap(texture);
 }
 
 Mesh::~Mesh()

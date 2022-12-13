@@ -23,14 +23,30 @@ namespace dae {
 		}
 
 		std::vector<Vertex> vertices{
-			{{.0f, .5f, .5f},{1.f, 0.f, 0.f}},
-			{{.5f, -.5f, .5f},{0.f, 0.f, 1.f}},
-			{{-.5f, -.5f, .5f},{0.f, 1.f, 0.f}},
+			{{-3.f, 3.f, -2.f}		,{1.f, 1.f, 1.f},	{0.0f, 0.0f}},
+			{{0.f, 3.f, -2.f}		,{1.f, 1.f, 1.f},	{0.5f, 0.0f}},
+			{{3.f, 3.0f, -2.f}		,{1.f, 1.f, 1.f},	{1.0f, 0.f}},
+			{{-3.f, 0.f, -2.f}		,{1.f, 1.f, 1.f},	{0.f, 0.5f}},
+			{{0.f, 0.f, -2.f}		,{1.f, 1.f, 1.f},	{0.5f, 0.5f}},
+			{{3.f, 0.f, -2.f}		,{1.f, 1.f, 1.f},	{1.0f, 0.5f}},
+			{{-3.f, -3.f, -2.f}		,{1.f, 1.f, 1.f},	{0.0f, 1.0f}},
+			{{0.f, -3.f, -2.f}		,{1.f, 1.f, 1.f},	{0.5f, 1.0f}},
+			{{3.f, -3.f, -2.f}		,{1.f, 1.f, 1.f},	{1.0f, 1.0f}},
 		};
 
-		std::vector<uint32_t> indices{0,1,2};
+		std::vector<uint32_t> indices{
+			3,0,1,  1,4,3,  4,1,2,
+			2,5,4,  6,3,4,  4,7,6,
+			7,4,5,  5,8,7,
+		};
+
+		m_pDiffuseTexture = Texture::LoadFromFile(m_pDevice, "Resources/uv_grid_2.png");
 
 		m_pMesh = new Mesh(m_pDevice, vertices, indices);
+		m_pMesh->SetTexture(m_pDiffuseTexture);
+
+		m_pCamera = new Camera();
+		m_pCamera->Initialize((float)m_Width / (float)m_Height, 45.f, { 0,0, -10.f });
 	}
 
 	Renderer::~Renderer()
@@ -51,11 +67,18 @@ namespace dae {
 
 			delete m_pMesh;
 		}
+
+		delete m_pCamera;
+
+		if (m_pDiffuseTexture != nullptr)
+		{
+			delete m_pDiffuseTexture;
+		}
 	}
 
-	void Renderer::Update(const Timer* pTimer)
+	void Renderer::Update(Timer* pTimer)
 	{
-
+		m_pCamera->Update(pTimer);
 	}
 
 
@@ -70,7 +93,8 @@ namespace dae {
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Setup pipeline + invoke draw calls
-		m_pMesh->Render(m_pDeviceContext);
+		Matrix wvp = m_pCamera->GetViewMatrix() * m_pCamera->GetProjectionMatrix();
+		m_pMesh->Render(m_pDeviceContext, wvp);
 
 		// Present back buffer
 		m_pSwapChain->Present(0, 0);

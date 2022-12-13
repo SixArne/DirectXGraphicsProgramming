@@ -2,17 +2,15 @@
 
 #include <DirectXMath.h>
 #include "Effect.h"
+#include "Matrix.h"
+#include "Math.h"
+#include "Texture.h"
 
-struct Vec3
-{
-	float x{};
-	float y{};
-	float z{};
-};
 
 struct Vertex {
-	Vec3 position {};
-	Vec3 color{};
+	dae::Vector3 position{};
+	dae::Vector3 color{};
+	dae::Vector2 uv{};
 };
 
 class Mesh
@@ -20,7 +18,8 @@ class Mesh
 public:
 	Mesh() = default;
 	Mesh(ID3D11Device* pDevice, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
-	void Render(ID3D11DeviceContext* pDeviceContext) const;
+	void Render(ID3D11DeviceContext* pDeviceContext, dae::Matrix& wvp) const;
+	void SetTexture(dae::Texture* texture);
 	~Mesh();
 
 private:
