@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Renderer.h"
 #include "Mesh.h"
+#include "Utils.h"
 
 namespace dae {
 
@@ -22,6 +23,11 @@ namespace dae {
 			std::cout << "DirectX initialization failed!\n";
 		}
 
+		std::vector<Vertex> vertices{};
+		std::vector<uint32_t> indices{};
+		dae::Utils::ParseOBJ("Resources/vehicle.obj", vertices, indices, false);
+
+		/*
 		std::vector<Vertex> vertices{
 			{{-3.f, 3.f, -2.f}		,{1.f, 1.f, 1.f},	{0.0f, 0.0f}},
 			{{0.f, 3.f, -2.f}		,{1.f, 1.f, 1.f},	{0.5f, 0.0f}},
@@ -39,8 +45,9 @@ namespace dae {
 			2,5,4,  6,3,4,  4,7,6,
 			7,4,5,  5,8,7,
 		};
+		*/
 
-		m_pDiffuseTexture = Texture::LoadFromFile(m_pDevice, "Resources/uv_grid_2.png");
+		m_pDiffuseTexture = Texture::LoadFromFile(m_pDevice, "Resources/vehicle_diffuse.png");
 
 		m_pMesh = new Mesh(m_pDevice, vertices, indices);
 		m_pMesh->SetTexture(m_pDiffuseTexture);

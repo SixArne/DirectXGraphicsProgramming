@@ -29,6 +29,8 @@ VS_OUTPUT VS(VS_INPUT input)
 	output.Position = float4(input.Position, 1.f);
 	output.Position = mul( output.Position, gWorldViewProj);
 	output.Color = input.Color;
+	output.Uv = input.Uv;
+
 	return output;
 }
 

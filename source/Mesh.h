@@ -9,7 +9,7 @@
 
 struct Vertex {
 	dae::Vector3 position{};
-	dae::Vector3 color{};
+	dae::Vector3 color{1,1,1};
 	dae::Vector2 uv{};
 };
 
